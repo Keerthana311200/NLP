@@ -1,0 +1,19 @@
+import nltk
+
+# Download required datasets if you haven't already
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+# Sample text for POS tagging
+text = "NLTK is a leading platform for building Python programs to work with human language data."
+
+# Tokenize the text into words
+tokens = nltk.word_tokenize(text)
+
+# Perform POS tagging
+pos_tags = nltk.pos_tag(tokens)
+
+# Output the POS tags
+print("Part-of-Speech Tags:")
+for word, tag in pos_tags:
+    print(f"{word} -> {tag}")
