@@ -1,0 +1,333 @@
+#REGULAR EXPRESSION:
+import re
+
+text = "hello, my email is keer23@2.com"
+pattern = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+
+match = re.search(pattern, text)
+
+if match:
+    print("Found email:", match.group())
+else:
+    print("Not found")
+
+
+#FOS EMD WITH AB:
+str = "aab"
+state = "q0"
+for char in str:
+    if state == "q0" and char == "a":
+        state = "q1"
+    elif state == "q1" and char == "b":
+        state = "q2"
+    elif char != "a":
+        state = "q0"
+if state == "q2":
+    print("accepted")
+else:
+    print("not accepted")
+
+
+#MORPHOLOGICAL ANALYSIS USING NLTK:
+import nltk
+from nltk.stem import PorterStemmer, WordNetLemmatizer
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+words=["running","jumping"]
+stemmer= PorterStemmer()
+lemmatizer=WordNetLemmatizer()
+for word in words:
+  print(f"{word}:-> stemmed: {stemmer.stem(word)},lemmatized:{lemmatizer.lemmatize(word)}")
+
+
+#SINGGULAR PLURS:
+nouns = ["cat", "dog", "baby", "church", "fox", "lady", "class"]
+
+for noun in nouns:
+    if noun.endswith('y') and noun[-2] not in 'aeiou':
+        plural = noun[:-1] + "ies"
+    elif noun.endswith(('s', 'sh', 'ch', 'x', 'z')):
+        plural = noun + "es"
+    else:
+        plural = noun + "s"
+    print(f"{noun} -> {plural}")
+
+
+#WORD STEMMING:
+import nltk
+from nltk.stem import PorterStemmer
+stemmer=PorterStemmer()
+words=["running","jumps"]
+for word in words:
+  stemmed_word=stemmer.stem(word)
+  print(f"{word}->{stemmed_word}")
+
+#N GRAMS, BIGRAM:
+import random
+
+text = "I love programming and programming loves me"
+
+words = text.split()
+bigrams = {w1: [] for w1 in words[:-1]}
+for w1, w2 in zip(words[:-1], words[1:]):
+    bigrams[w1].append(w2)
+output = ["I"]
+for _ in range(10):
+    next_words = bigrams.get(output[-1], [])
+    if not next_words: break
+    output.append(random.choice(next_words))
+print(' '.join(output))
+
+
+
+#TAGGING POS:
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+text = "I love programming and it is fun."
+
+words = nltk.word_tokenize(text)
+
+pos_tags = nltk.pos_tag(words)
+
+print(pos_tags)
+
+
+
+#TOP DOWN PARSER
+class Parser:
+    def __init__(self, expr):
+        self.tokens = expr.split()
+        self.pos = 0
+    def parse(self):
+        return self.T()
+    def T(self):
+        num = int(self.tokens[self.pos])
+        self.pos += 1
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == '+':
+            self.pos += 1
+            return ('+', num, self.T())
+        return num
+
+result = Parser("3 + 5").parse()
+print(result)  # Output: ('+', 3, 5)  
+
+
+
+#EARLY PARSER TREE:
+import nltk
+from nltk.grammar import CFG
+
+grammar = CFG.fromstring("""
+    S -> NP VP
+    NP -> DET N
+    VP -> V NP
+    DET -> 'the'
+    N -> 'cat' | 'dog'
+    V -> 'chased' | 'saw'
+""")
+parser = EarleyChartParser(grammar)
+
+sent = "the cat chased the dog".split()
+
+for tree in parser.parse(sent):
+    print(tree)
+    tree.pretty_print()
+
+
+# viterbi parser:
+import nltk
+from nltk import PCFG
+
+grammar = PCFG.fromstring("""
+    S -> NP VP [1.0]
+    NP -> DET N [0.7] | DET N CONJ NP [0.3]
+    VP -> V NP [1.0]
+    DET -> 'the' [0.6] | 'a' [0.4]
+    N -> 'cat' [0.5] | 'dog' [0.5]
+    V -> 'chased' [0.5] | 'saw' [0.5]
+""")
+
+parser = nltk.ViterbiParser(grammar)
+sentence = "the cat chased the dog".split()
+parse_tree = next(parser.parse(sentence), None)
+
+if parse_tree:
+    print("Most probable parse tree:")
+    parse_tree.pretty_print()
+else:
+    print("Cannot parse the sentence.")
+
+
+
+
+#spacy library 
+import spacy
+nlp = spacy.load("en_core_web_sm")
+text = "Apple is looking at buying U.K. startup for $1 billion."
+
+doc = nlp(text)
+print("Named Entities, Phrases, and Concepts:")
+for ent in doc.ents:
+
+    print(f"{ent.text} ({ent.label_})")
+
+
+
+#wordnet:
+import nltk
+from nltk.corpus import wordnet as wn
+
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+word = "apple"
+synsets = wn.synsets(word)
+for synset in synsets:
+    print(f"Synset: {synset.name()}")
+    print(f"Definition: {synset.definition()}")
+    print()
+
+
+#FOPC FIRST ODER LOGIC:
+class FOPCParser:
+    def parse(self, expr):
+        expr = expr.replace(" ", "")  # Remove spaces
+        if expr.startswith(('∀', '∃')):
+            return f"{expr[0]}({self.parse(expr[1:] )})"
+        elif '→' in expr:
+            left, right = expr.split('→', 1)
+            return f"Implies({self.parse(left)}, {self.parse(right)})"
+        elif '∧' in expr:
+            left, right = expr.split('∧', 1)
+            return f"And({self.parse(left)}, {self.parse(right)})"
+        elif '∨' in expr:
+            left, right = expr.split('∨', 1)
+            return f"Or({self.parse(left)}, {self.parse(right)})"
+        elif '¬' in expr:
+            return f"Not({self.parse(expr[1:] )})"
+        return expr  # Base case: return variable
+
+# Example usage
+parser = FOPCParser()
+output = parser.parse("∀x (P(x) → ∃y (Q(y) ∧ R(x, y)))")
+print(output)
+
+
+#WORDENT FOR MEANING:
+import nltk
+from nltk.corpus import wordnet as wn
+
+nltk.download('wordnet')
+nltk.download('omw-1.4')
+synset = wn.synsets("apple")[0]
+print(synset.definition())
+
+
+#TF-DT
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
+
+docs = ["The cat is on the table.", "Dogs are in the garden."]
+query = "cats garden"
+
+scores = TfidfVectorizer().fit_transform(docs + [query]).T[-1].A[0][:-1]
+for idx in scores.argsort()[::-1]:
+    print(docs[idx], scores[idx])
+
+
+
+#SYNTAX DRIVEN SEMANTIC ANALYSIS MEANINGS FROM A SENTENCE:
+import nltk
+from nltk import pos_tag, word_tokenize
+from nltk.corpus import wordnet as wn
+
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+nltk.download('wordnet')
+
+sentence = "The quick brown fox jumps over the lazy dog"
+words = word_tokenize(sentence)
+meanings = {word: [syn.definition() for syn in wn.synsets(word)] for word, tag in pos_tag(words) if 'NN' in tag}
+
+print(meanings)
+
+
+
+#REFERENCE RESOLVE:
+def resolve_reference(text):
+    words = text.split()
+    reference = ""
+
+    for i, word in enumerate(words):
+        if word.lower() in ["she", "he"]:
+            words[i] = reference if reference else word
+        elif word[0].isupper():  # Proper noun check
+            reference = word
+
+    return ' '.join(words)
+
+text = "Alice has a dog. She likes her dog."
+resolved_text = resolve_reference(text)
+print(resolved_text)
+
+
+
+#COHERENCE:
+import spacy
+
+nlp = spacy.load("en_core_web_sm")
+
+def evaluate_coherence(text):
+    sentences = list(nlp(text).sents)
+    return sum(sentences[i].similarity(sentences[i + 1]) for i in range(len(sentences) - 1)) / (len(sentences) - 1) if len(sentences) > 1 else 1
+
+text = "The cat sat on the mat. It was a sunny day. The cat chased a butterfly."
+coherence = evaluate_coherence(text)
+print(f"Coherence Score: {coherence:.2f}")
+
+
+#DIALOG CONVERSATION
+import nltk
+from nltk.tokenize import sent_tokenize
+
+nltk.download('punkt')
+
+def classify_dialog_act(sentence):
+    if "?" in sentence: return "question"
+    elif "please" in sentence: return "command"
+    elif "hi" in sentence: return "greeting"
+    elif "bye" in sentence: return "farewell"
+    return "statement"
+
+dialog = "Hi! How are you? Please help. Bye."
+for sentence in sent_tokenize(dialog):
+    print(f"Sentence: '{sentence}' | Dialog Act: '{classify_dialog_act(sentence)}'")
+
+
+#TRASLATION
+from transformers import pipeline
+
+translator = pipeline("translation_en_to_fr")
+
+english_text = "Hello, how are you?"
+
+translated_text = translator(english_text, max_length=40)[0]['translation_text']
+
+print(f"English: {english_text}")
+print(f"French: {translated_text}")
+
+
+#GPT:
+import openai
+openai.api_key = "your-api-key-here"
+
+prompt = "Once upon a time in a land far away, there lived a"
+
+response = openai.Completion.create(
+  engine="text-davinci-003",  
+  prompt=prompt, 
+
+print(response.choices[0].text.strip())
+
+
